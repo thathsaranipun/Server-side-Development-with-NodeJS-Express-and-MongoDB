@@ -1,33 +1,35 @@
-var rect = {
-    perimeter: (x, y) => (2 * (x + y)),
-    area: (x, y) => (x * y)
-};
+const express = require('express'),
+     http = require('http');
 
-function solveReact(l, b) {
-    console.log("Solving for rectangle with l = " + l + " and b = " + b)
-    if (l <= 0 || b <= 0) {
-        console.log("Please enter again please")
-    } else {
-        console.log("The area of the rectangele is " + rect.area(l, b))
-        console.log("The perimeter of rectangele is " + rect.perimeter(l, b))
-    }
-}
-solveReact(2, 4);
-solveReact(4, 4);
-solveReact(-2, 4);
-solveReact(8, 4);
+const dishRouter = require('./routes/dishRouter');
+const promoRouter = require('./routes/promoRouter');
+const leaderRouter = require('./routes/leaderRouter');
+
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const hostname = 'localhost';
+const port = 3000;
 
 
+const app = express();
+app.use(bodyParser.json());
+app.use(morgan('dev'));
+app.use(express.static(__dirname + '/public'));
 
-var people = {
-    office_members: (x, y, z) => ((x * y) + z),
-    absent_members: (k, t) => (k * t)
-}
+app.use('/dishes', dishRouter);
+app.use('/promotions', promoRouter);
+app.use('/leaders', leaderRouter);
 
-function office_present(x, y, z, k, t) {
-    console.log("present members " + people.office_members(x, y, z))
-    console.log("absent members " + people.absent_members(k, t))
+app.use((req, res, next) => {
+  console.log(req.headers);
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html');
+  res.end('<html><body><h1>This is an Express Server</h1></body></html>');
 
-}
+});
 
-office_present(1, 2, 3, 4, 5)
+const server = http.createServer(app);
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
